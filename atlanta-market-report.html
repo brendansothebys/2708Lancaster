@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlanta MLS Market Report — March 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1d1d1f;
+    --ink-2: #424245;
+    --ink-3: #86868b;
+    --paper: #f5f5f7;
+    --surface: #ffffff;
+    --rule: rgba(0,0,0,0.08);
+    --rule-strong: rgba(0,0,0,0.16);
+    --gold: #bf8f2a;
+    --gold-light: #f5ead4;
+    --up: #1d7a3a;
+    --up-bg: #e6f4ea;
+    --dn: #9b1c1c;
+    --dn-bg: #fce8e8;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  }
+
+  html { background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+
+  body { min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3.5rem 2rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 60px
+    );
+    pointer-events: none;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .header-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    line-height: 1.06;
+    color: #fff;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.6rem;
+  }
+  .header-title em {
+    font-style: normal;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+  }
+  .header-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    align-items: center;
+  }
+  .meta-chip {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-chip::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .live-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(191,143,42,0.18);
+    color: var(--gold);
+    border: 1px solid rgba(191,143,42,0.35);
+    border-radius: 100px;
+    padding: 3px 10px;
+  }
+  .header-date {
+    text-align: right;
+  }
+  .header-date .month {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,0.8);
+    display: block;
+  }
+  .header-date .year {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 2rem 4rem;
+  }
+
+  /* ── TABS ── */
+  .tab-row {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--rule-strong);
+    margin-bottom: 2.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tab-row::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-3);
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px;
+  }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active {
+    color: var(--ink);
+    font-weight: 500;
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; }
+  .section.visible { display: block; }
+  .section + .section { margin-top: 2.5rem; }
+
+  .section-heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1rem;
+  }
+
+  /* ── CARDS ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    text-decoration: none;
+  }
+  .card:hover {
+    border-color: var(--rule-strong);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .card-category {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .card-type {
+    font-size: 10px;
+    font-weight: 500;
+    background: var(--paper);
+    color: var(--ink-3);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  .card-name {
+    font-size: 12px;
+    color: var(--ink-2);
+    line-height: 1.3;
+  }
+
+  .card-value {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1.1;
+    margin: 4px 0 6px;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mom {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .mom.up { background: var(--up-bg); color: var(--up); }
+  .mom.dn { background: var(--dn-bg); color: var(--dn); }
+
+  .chart-link {
+    font-size: 11px;
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+  .chart-link:hover { opacity: 1; }
+
+  /* ── SUMMARY BANNER ── */
+  .summary-banner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+  .summary-item {
+    background: var(--surface);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .summary-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .summary-val {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .summary-change {
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .summary-change.up { color: var(--up); }
+  .summary-change.dn { color: var(--dn); }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    background: var(--ink);
+    padding: 2rem;
+  }
+  .site-footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .footer-brand { text-align: left; }
+  .footer-brand-name {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(255,255,255,0.85);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .footer-brand-firm {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+  }
+  .footer-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.06em;
+    text-align: right;
+    line-height: 1.8;
+  }
+  .site-footer a { color: var(--gold); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .site-header { padding: 2.5rem 1.25rem 2rem; }
+    .main { padding: 1.5rem 1.25rem 3rem; }
+    .header-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .header-date { text-align: left; }
+    .cards { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+</style>
+</head>
+<body>
+
+<nav style="background:#111;padding:0.7rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(191,143,42,0.2);flex-wrap:wrap;gap:8px;-webkit-font-smoothing:antialiased;">
+  <span style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:1rem;font-weight:600;letter-spacing:-0.01em;color:#fff;">Brendan Wright</span>
+  <span style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:400;color:rgba(191,143,42,0.75);letter-spacing:0.01em;">Atlanta Fine Homes | Sotheby's International Realty</span>
+</nav>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div>
+      <p class="header-eyebrow">FMLS InfoSparks · EP Market Area</p>
+      <h1 class="header-title">Atlanta<br><em>Market Report</em></h1>
+      <div class="header-meta">
+        <span class="meta-chip">$350,000 – $475,999</span>
+        <span class="meta-chip">All Property Types</span>
+        <span class="live-pill">Live Data</span>
+      </div>
+    </div>
+    <div class="header-date">
+      <span class="month">March</span>
+      <span class="year">2026</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- SUMMARY BANNER -->
+  <div class="summary-banner">
+    <div class="summary-item">
+      <span class="summary-label">Median sales price</span>
+      <span class="summary-val">$376,750</span>
+      <span class="summary-change dn">▼ 0.9% MoM</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Closed sales</span>
+      <span class="summary-val">28</span>
+      <span class="summary-change dn">▼ 17.6% MoM</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Months supply</span>
+      <span class="summary-val">6.9</span>
+      <span class="summary-change up">▲ 11.3% MoM</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Median DOM</span>
+      <span class="summary-val">38</span>
+      <span class="summary-change dn">▼ 5.0% MoM</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">% of list price</span>
+      <span class="summary-val">98.7%</span>
+      <span class="summary-change dn">▼ 1.2% MoM</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <nav class="tab-row" role="tablist" aria-label="Metric categories">
+    <button class="tab-btn active" data-filter="all" role="tab" aria-selected="true">All metrics</button>
+    <button class="tab-btn" data-filter="pricing" role="tab" aria-selected="false">Pricing</button>
+    <button class="tab-btn" data-filter="supply" role="tab" aria-selected="false">Supply &amp; demand</button>
+    <button class="tab-btn" data-filter="speed" role="tab" aria-selected="false">Market speed</button>
+    <button class="tab-btn" data-filter="nego" role="tab" aria-selected="false">Negotiation</button>
+    <button class="tab-btn" data-filter="showing" role="tab" aria-selected="false">Showing activity</button>
+  </nav>
+
+  <!-- PRICING -->
+  <section class="section visible" data-section="pricing">
+    <h2 class="section-heading">Pricing metrics</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><span class="card-category">Pricing</span><span class="card-type">Median</span></div>
+        <div class="card-name">Sales price</div>
+        <div class="card-value">$376,750</div>
+        <div class="card-footer"><span class="mom dn">▼ 0.9%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRj-LVw" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Pricing</span><span class="card-type">Average</span></div>
+        <div class="card-name">Sales price</div>
+        <div class="card-value">$392,146</div>
+        <div class="card-footer"><span class="mom up">▲ 0.2%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRP-XHP" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Pricing</span><span class="card-type">Median</span></div>
+        <div class="card-name">Price per sq ft</div>
+        <div class="card-value">$198</div>
+        <div class="card-footer"><span class="mom up">▲ 5.9%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTR4-EgD" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Pricing</span><span class="card-type">Average</span></div>
+        <div class="card-name">Price per sq ft</div>
+        <div class="card-value">$197</div>
+        <div class="card-footer"><span class="mom up">▲ 1.5%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRk-x2d" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPLY & DEMAND -->
+  <section class="section visible" data-section="supply">
+    <h2 class="section-heading">Supply &amp; demand</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><span class="card-category">Supply</span><span class="card-type">Count</span></div>
+        <div class="card-name">New listings</div>
+        <div class="card-value">75</div>
+        <div class="card-footer"><span class="mom dn">▼ 15.7%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRe-b1I" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Supply</span><span class="card-type">Count</span></div>
+        <div class="card-name">Homes for sale</div>
+        <div class="card-value">18</div>
+        <div class="card-footer"><span class="mom dn">▼ 5.3%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRs-eDC" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Demand</span><span class="card-type">Count</span></div>
+        <div class="card-name">Pending sales</div>
+        <div class="card-value">24</div>
+        <div class="card-footer"><span class="mom dn">▼ 38.5%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRu-W0n" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Demand</span><span class="card-type">Count</span></div>
+        <div class="card-name">Closed sales</div>
+        <div class="card-value">28</div>
+        <div class="card-footer"><span class="mom dn">▼ 17.6%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRq-XxS" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Supply</span><span class="card-type">Months</span></div>
+        <div class="card-name">Months supply</div>
+        <div class="card-value">6.9</div>
+        <div class="card-footer"><span class="mom up">▲ 11.3%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRJ-E4a" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Volume</span><span class="card-type">Total</span></div>
+        <div class="card-name">Dollar volume</div>
+        <div class="card-value">$10.98M</div>
+        <div class="card-footer"><span class="mom dn">▼ 17.5%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTR0-Ren" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARKET SPEED -->
+  <section class="section visible" data-section="speed">
+    <h2 class="section-heading">Market speed</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><span class="card-category">Speed</span><span class="card-type">Median</span></div>
+        <div class="card-name">Days on market</div>
+        <div class="card-value">38</div>
+        <div class="card-footer"><span class="mom dn">▼ 5.0%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRr-jEw" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Speed</span><span class="card-type">Average</span></div>
+        <div class="card-name">Days on market</div>
+        <div class="card-value">52</div>
+        <div class="card-footer"><span class="mom dn">▼ 1.9%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRK-i7e" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Speed</span><span class="card-type">Median</span></div>
+        <div class="card-name">Cumulative DOM</div>
+        <div class="card-value">67</div>
+        <div class="card-footer"><span class="mom up">▲ 36.7%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRa-Pzm" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Speed</span><span class="card-type">Average</span></div>
+        <div class="card-name">Cumulative DOM</div>
+        <div class="card-value">97</div>
+        <div class="card-footer"><span class="mom up">▲ 49.2%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTR1-hdQ" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEGOTIATION -->
+  <section class="section visible" data-section="nego">
+    <h2 class="section-heading">Negotiation &amp; pricing strength</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><span class="card-category">Negotiation</span><span class="card-type">Median</span></div>
+        <div class="card-name">% of list price received</div>
+        <div class="card-value">98.7%</div>
+        <div class="card-footer"><span class="mom dn">▼ 1.2%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRU-P18" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Negotiation</span><span class="card-type">Average</span></div>
+        <div class="card-name">% of list price received</div>
+        <div class="card-value">98.1%</div>
+        <div class="card-footer"><span class="mom dn">▼ 0.8%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTR6-TYp" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Negotiation</span><span class="card-type">Median</span></div>
+        <div class="card-name">% of original price received</div>
+        <div class="card-value">96.4%</div>
+        <div class="card-footer"><span class="mom dn">▼ 1.3%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRx-9f" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Negotiation</span><span class="card-type">Average</span></div>
+        <div class="card-name">% of original price received</div>
+        <div class="card-value">95.3%</div>
+        <div class="card-footer"><span class="mom dn">▼ 0.7%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRI-fIr" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWING ACTIVITY -->
+  <section class="section visible" data-section="showing">
+    <h2 class="section-heading">Showing activity</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-header"><span class="card-category">Showing</span><span class="card-type">Median</span></div>
+        <div class="card-name">Showings to pending</div>
+        <div class="card-value">5.0</div>
+        <div class="card-footer"><span class="mom dn">▼ 9.1%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRN-h2" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Showing</span><span class="card-type">Average</span></div>
+        <div class="card-name">Showings to pending</div>
+        <div class="card-value">6.1</div>
+        <div class="card-footer"><span class="mom dn">▼ 20.8%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRV-SDu" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-category">Showing</span><span class="card-type">Total</span></div>
+        <div class="card-name">Showings per listing</div>
+        <div class="card-value">1.6</div>
+        <div class="card-footer"><span class="mom dn">▼ 23.8%</span><a class="chart-link" href="https://fmls.stats.showingtime.com/infoserv/s-v1/NTRg-unt" target="_blank" rel="noopener">View chart ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="footer-brand">
+      <span class="footer-brand-name">Brendan Wright</span>
+      <span class="footer-brand-firm">Atlanta Fine Homes | Sotheby's International Realty</span>
+    </div>
+    <div class="footer-meta">
+      Data: FMLS InfoSparks · EP Market Area · <a href="https://fmls.stats.showingtime.com" target="_blank" rel="noopener">fmls.stats.showingtime.com</a><br>
+      All chart links reflect live data · March 2026
+    </div>
+  </div>
+</footer>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const sections = document.querySelectorAll('.section');
+  const sectionMap = {
+    all: ['pricing','supply','speed','nego','showing'],
+    pricing: ['pricing'],
+    supply: ['supply'],
+    speed: ['speed'],
+    nego: ['nego'],
+    showing: ['showing']
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected','true');
+      const filter = tab.dataset.filter;
+      const show = sectionMap[filter];
+      sections.forEach(sec => {
+        sec.classList.toggle('visible', show.includes(sec.dataset.section));
+      });
+    });
+  });
+</script>
+</body>
+</html>
